@@ -70,14 +70,14 @@ public:
 			}
 		case 1:
 			{
-				return keyFramesList[index1].shift;
+				return keyFramesList[index1].position;
 			}
 		case 2:
 			{
 				float rate =(timepos - keyFramesList[index1].timepos) /
 					(keyFramesList[index2].timepos - keyFramesList[index1].timepos);
 				
-				return keyFramesList[index1].shift * (1-rate) + rate * keyFramesList[index2].shift; 
+				return keyFramesList[index1].position * (1-rate) + rate * keyFramesList[index2].position; 
 
 				break;
 			}
@@ -93,8 +93,8 @@ public:
 		while(cin>>timepos)
 		{
 			
-		vec3 shift = getInterpShift(timepos);
-		cout<<shift.x<<" "<<shift.y<<" "<<shift.z<<endl;
+		vec3 position = getInterpShift(timepos);
+		cout<<position.x<<" "<<position.y<<" "<<position.z<<endl;
 		
 		/*
 		int index1,index2;
@@ -162,11 +162,8 @@ private:
 					return 2;
 				}
 			}
-		}
-
-		
+		}		
 	}
-
 
 	/*存储关键帧的列表 的列表。该列表中的每一个元素，是某一个骨骼对应的不同时间的KeyFrame,按照timepos从小到大顺序排列。*/
 	vector<BoneKeyFrame>  keyFramesList;

@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/quaternion.hpp> 
+#include <glm/gtc/matrix_transform.hpp>
+
 #include <glew.h>
 #include<iostream>
 #include<vector>
@@ -16,15 +18,18 @@ using namespace glm;
 class MeshNode{
 public:
 
-	MeshNode(vector<vec3> &points,vec3 shift,quat rotation,Shader *shader,GLenum mode)
+	MeshNode(vector<vec3> &points,vec3 position,quat rotation,Shader *shader,GLenum mode)
 	{
 		this->shader = shader;
 		this->mode = mode;
-		this->shift = shift;
+		this->position = position;
 		this->rotation = rotation;
 		
 		this->numVertices = points.size();
 		this->rotation = rotation;
+
+		this->parent = nullptr;
+
 		glGenVertexArrays(1,&VAO);
 		glBindVertexArray(VAO);
 
@@ -42,14 +47,14 @@ public:
 	}
 
 
-	void setShift(vec3 shift)
+	void setShift(vec3 position)
 	{
-		this->shift = shift;
+		this->position = position;
 	}
 
 	vec3 getShift()
 	{
-		return this->shift;
+		return this->position;
 	}
 
 	void setRotation(quat rotation)
@@ -62,19 +67,56 @@ public:
 		return this->rotation;
 	}
 
+	void setParent(MeshNode *parent)
+	{
+		this->parent = parent;
+	}
 
+	//根据记录的关键帧信息更新骨骼状态
+	void update()
+	{
+		quat absolute_rotation;
+		vec3 absolute_position;
+
+		if(parent == nullptr)
+		{
+			absolute_rotation = rotation;
+			absolute_position = position;
+		}
+
+		else
+		{
+			quat rotation_parent = parent->rotation;
+			vec3 position_parent = parent->position;
+
+			vec3 absolute_position = position_parent + position;
+
+			/*
+			   p′=qp
+			   q是四元数。p和p′是向量。
+			*/
+			absolute_rotation = rotation_parent * rotation;
+		}
+
+		mat4 position_matrix;
+		position_matrix = translate(position_matrix,absolute_position);
+
+		mat4 rotation_matrix = mat4_cast(absolute_rotation);
+
+		transformation = position_matrix * rotation_matrix;
+	}
 
 private:
 	GLuint VAO;
 	GLuint VBO;
 
 	/*
-	相对于parent的旋转和位移。
+	相对于parent的旋转和位置。
 	tramsformation是要传入shader的变换矩阵，不是相对于parent的，而是相对于世界坐标系的变换矩阵。
-	计算时可以用parent的rotation和shift。渲染前从根节点开始更新，全部更新完了再渲染。
+	计算时可以用parent的rotation和position。渲染前从根节点开始更新，全部更新完了再渲染。
 	*/
 	quat rotation;
-	vec3 shift;
+	vec3 position;
 	mat4 transformation;
 
 	Shader *shader;
@@ -82,6 +124,7 @@ private:
 	int numVertices;
 
 	MeshNode *parent;
+	vector<MeshNode *> childrenList;
 
 	friend class Mesh;
 

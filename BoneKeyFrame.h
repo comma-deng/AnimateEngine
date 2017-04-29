@@ -11,6 +11,6 @@ struct BoneKeyFrame
 	TimePos timepos;
 
 	quat rotation;
-	vec3 shift;
+	vec3 position;
 };
 

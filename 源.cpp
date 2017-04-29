@@ -9,7 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "PixelManager.h"
 
-const float PI = 3.1415926;
+const float PI = 3.1415926f;
 
 using namespace std;
 
@@ -37,9 +37,10 @@ void quad(vector<vec3>& vertices,vector<vec3>& points,int a,int b,int c,int d)
 	points.push_back(vertices[d]);
 }
 
+/*
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 {
-	/*
+	
 	double xpos,ypos;
 	
 	if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
@@ -50,7 +51,7 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 		cout<< (int)info.obj_ID <<" "<<(int)info.mesh_ID<<endl;
 	}
 
-	*/
+	
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -84,7 +85,9 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 		isStart = true;
 	}
 }
+*/
 
+/*
 int main()
 {
 	glfwInit();
@@ -115,6 +118,7 @@ int main()
 
 	glfwSetMouseButtonCallback(window,mouse_button_callback);
 	glfwSetCursorPosCallback(window,mouse_callback);
+	
 	vector<vec3> box_vertices;
 	box_vertices.push_back(vec3(-0.5,-0.5,0.5));
 	box_vertices.push_back(vec3(-0.5,0.5,0.5));
@@ -135,17 +139,17 @@ int main()
 	quad(box_vertices,box_points,6,5,1,2);
 	quad(box_vertices,box_points,4,5,6,7);
 	quad(box_vertices,box_points,5,4,0,1);
-
+	
 
 	Shader simpleShader("vShader.glsl","fShader.glsl");
 	Shader InfoShader("vShader.glsl","InfofShader.glsl");
 
 	pixelmanager.Init(width,height);
 
-	vec3 shift(0.1,0.0,0.0);
+	vec3 position(0.1,0.0,0.0);
 	quat rotation =  angleAxis(1.0f,vec3(0,0,0));
 
-	MeshNode head(box_points,shift,rotation,&simpleShader,GL_TRIANGLES);
+	MeshNode head(box_points,position,rotation,&simpleShader,GL_TRIANGLES);
 
 	vector<MeshNode> meshList;
 	meshList.push_back(head);
@@ -158,3 +162,59 @@ int main()
     glfwTerminate();
     return 0; 
 } 
+*/
+
+int main()
+{
+	glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
+	GLFWwindow* window = glfwCreateWindow(1000,800,"cooma's window",nullptr,nullptr);
+	if(window == nullptr) 
+	{
+		std::cout<<"fail to create glfw window!"<<std::endl;
+		glfwTerminate();
+		return -1;
+	}
+	glfwMakeContextCurrent(window);
+
+	glewExperimental = GL_TRUE;
+	if(glewInit()!=GLEW_OK)
+	{
+		std::cout<<"failed to initialize glew!";
+		return -1;
+
+	}
+	int width,height;
+	glfwGetFramebufferSize(window,&width,&height);
+	glViewport(0,0,width,height);
+
+	
+	Shader simpleShader("vShader.glsl","fShader.glsl");
+
+	quat rotation = angleAxis(PI/2,vec3(0,0,1));
+	vec3 pos(0,0,0);
+	vector<vec3> points;
+	points.push_back(vec3(0.5,0,0));
+	points.push_back(vec3(0,-0.5,0));
+	points.push_back(vec3(0,0.5,0));
+	MeshNode node(points,pos,rotation,&simpleShader,GL_TRIANGLES);
+
+	node.update();
+
+	glfwPollEvents();
+
+	glfwSwapBuffers(window);
+
+	glClearColor(0.5,0.2,0.1,0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
+	glEnable(GL_DEPTH_TEST);
+	
+	Mesh::test(node,window);
+	
+
+
+}

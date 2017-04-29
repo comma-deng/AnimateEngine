@@ -1,10 +1,13 @@
 #pragma once 
-#include "MeshNode.h"
-#include "Pixelmanager.h"
-#include "Shader.h"
+
+#include <queue>
+
 #include <glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "MeshNode.h"
+#include "Pixelmanager.h"
+#include "Shader.h"
 
 extern PixelManager pixelmanager;
 
@@ -17,6 +20,8 @@ private:
 	unsigned int ID;
 
 	static unsigned int totalNum;
+
+	MeshNode *root;
 	
 
 public:
@@ -36,6 +41,27 @@ public:
 	void registerThis(Mesh * list[])
 	{
 		list[ID] = this;
+	}
+
+	void update()
+	{
+		queue<MeshNode*> nodeQueue;
+		nodeQueue.push(root);
+
+		while(!nodeQueue.empty())
+		{
+			MeshNode* node = nodeQueue.front();
+			nodeQueue.pop();
+
+			node->update();
+
+			for(int i = 0;i < node->childrenList.size();++i)
+			{
+				nodeQueue.push(node->childrenList[i]);
+			}
+
+		}
+		
 	}
 
 	void render()
@@ -96,6 +122,25 @@ public:
 		}
 		pixelmanager.disableWrite();
 	}
+
+	static void test(MeshNode &cur,GLFWwindow* window)
+	{
+		while(!glfwWindowShouldClose(window))
+		{
+			glfwPollEvents();
+			glClearColor(0.5,0.2,0.1,0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // We're not using stencil buffer so why bother with clearing?
+			glEnable(GL_DEPTH_TEST);
+			cur.shader->Use();
+			GLuint modelLoc = glGetUniformLocation(cur.shader->program,"model"); 
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, value_ptr(cur.transformation));
+			glBindVertexArray(cur.VAO);
+			glDrawArrays(cur.mode,0,cur.numVertices);
+			glBindVertexArray(0);
+			glfwSwapBuffers(window);
+		}
+	}
+
 };
 
 unsigned int Mesh::totalNum = 1;
