@@ -73,7 +73,8 @@ public:
 	}
 
 	//根据记录的关键帧信息更新骨骼状态
-	void update()
+	//if(parent == nullptr)路径已测试。无误。
+	void updateTransformation()
 	{
 		quat absolute_rotation;
 		vec3 absolute_position;
@@ -100,10 +101,11 @@ public:
 
 		mat4 position_matrix;
 		position_matrix = translate(position_matrix,absolute_position);
-
+		mat4 inverse_position_matrix;
+		inverse_position_matrix = translate(inverse_position_matrix,-absolute_position);
 		mat4 rotation_matrix = mat4_cast(absolute_rotation);
 
-		transformation = position_matrix * rotation_matrix;
+		transformation = position_matrix * rotation_matrix * inverse_position_matrix;
 	}
 
 private:

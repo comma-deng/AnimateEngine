@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "KeyFrameTracker.h"
+#include "KeyFrameTrack.h"
 #include "MeshNode.h"
 
 #define PI 3.14f
@@ -24,7 +24,7 @@ int main()
 	KeyFrameList.push_back(k2);
 	KeyFrameList.push_back(k3);
 
-	KeyFrameTracker tracker(KeyFrameList);
+	KeyFrameTrack track(KeyFrameList);
 	tracker.test();
 }
 */

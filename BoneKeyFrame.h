@@ -6,10 +6,14 @@ using namespace glm;
 
 #define TimePos  double
 
-struct BoneKeyFrame
+class BoneKeyFrame
 {
-	TimePos timepos;
+public:
+	BoneKeyFrame(TimePos timePos,quat rotation,vec3 position):
+		timepos(timePos),rotation(rotation),position(position)
+	{}
 
+	TimePos timepos;
 	quat rotation;
 	vec3 position;
 };

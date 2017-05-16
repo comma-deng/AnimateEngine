@@ -8,6 +8,7 @@
 #include "MeshNode.h"
 #include "Pixelmanager.h"
 #include "Shader.h"
+#include "KeyFrameTrack.h"
 
 extern PixelManager pixelmanager;
 
@@ -53,7 +54,7 @@ public:
 			MeshNode* node = nodeQueue.front();
 			nodeQueue.pop();
 
-			node->update();
+			node->updateTransformation();
 
 			for(int i = 0;i < node->childrenList.size();++i)
 			{
@@ -115,7 +116,6 @@ public:
 			GLuint meshIndexPos = glGetUniformLocation(infoShader->program,"meshIndexDivideBy255"); 
 			glUniform1f(meshIndexPos,GLfloat(i)/255);
 
-
 			glBindVertexArray(cur.VAO);
 			glDrawArrays(cur.mode,0,cur.numVertices);
 			glBindVertexArray(0);
@@ -123,7 +123,7 @@ public:
 		pixelmanager.disableWrite();
 	}
 
-	static void test(MeshNode &cur,GLFWwindow* window)
+	static void test(MeshNode &cur,KeyFrameTrack &track,double start,GLFWwindow* window)
 	{
 		while(!glfwWindowShouldClose(window))
 		{
@@ -132,6 +132,13 @@ public:
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // We're not using stencil buffer so why bother with clearing?
 			glEnable(GL_DEPTH_TEST);
 			cur.shader->Use();
+			
+			if(track.isEnable())
+			{
+				TimePos timePos = glfwGetTime() - start;
+				track.apply(timePos);
+			}
+
 			GLuint modelLoc = glGetUniformLocation(cur.shader->program,"model"); 
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, value_ptr(cur.transformation));
 			glBindVertexArray(cur.VAO);

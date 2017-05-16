@@ -195,15 +195,22 @@ int main()
 	
 	Shader simpleShader("vShader.glsl","fShader.glsl");
 
-	quat rotation = angleAxis(PI/2,vec3(0,0,1));
+	quat rotation = angleAxis(0.0f,vec3(0,1,0));
 	vec3 pos(0,0,0);
 	vector<vec3> points;
 	points.push_back(vec3(0.5,0,0));
-	points.push_back(vec3(0,-0.5,0));
-	points.push_back(vec3(0,0.5,0));
+	points.push_back(vec3(-0.5,0.0,0));
+	points.push_back(vec3(0.0,1.0,0.0));
 	MeshNode node(points,pos,rotation,&simpleShader,GL_TRIANGLES);
+	
+	node.updateTransformation();
 
-	node.update();
+	vector<BoneKeyFrame> keyFrameList;
+	keyFrameList.push_back(BoneKeyFrame(0.0,quat(),vec3()));
+	keyFrameList.push_back(BoneKeyFrame(3.0,angleAxis(PI/3,vec3(0,1,0)),vec3(0,0,0)));
+	KeyFrameTrack track(keyFrameList,&node);
+	track.enable();
+
 
 	glfwPollEvents();
 
@@ -212,8 +219,10 @@ int main()
 	glClearColor(0.5,0.2,0.1,0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 	glEnable(GL_DEPTH_TEST);
+
+	double start_time = glfwGetTime();
 	
-	Mesh::test(node,window);
+	Mesh::test(node,track,start_time,window);
 	
 
 

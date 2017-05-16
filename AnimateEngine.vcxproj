@@ -101,7 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BoneKeyFrame.h" />
-    <ClInclude Include="KeyFrameTracker.h" />
+    <ClInclude Include="KeyFrameTrack.h" />
     <ClInclude Include="Mesh.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClInclude>

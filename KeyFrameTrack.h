@@ -8,20 +8,22 @@
 #include <glm/glm.hpp>
 
 #include "BoneKeyFrame.h"
+#include "MeshNode.h"
 
 using namespace std;
 
 /*
-	一个meshNode对应一个KeyFrameTracker。
+	一个meshNode对应一个KeyFrameTrack。
 	一个animation对应一个Mesh。
-	管理一系列KeyFrameTracker。
+	管理一系列KeyFrameTrack。
 */
-class KeyFrameTracker
+class KeyFrameTrack
 {
 public:
-	KeyFrameTracker(vector<BoneKeyFrame> list)
+	KeyFrameTrack(vector<BoneKeyFrame> list,MeshNode *node)
 	{
 		this->keyFramesList = list;
+		this->node = node;
 	}
 
 	//TOTEST:有待测试
@@ -35,6 +37,7 @@ public:
 		case 0:
 			{
 				cerr<<"找不到KeyFrame！";
+				return keyFramesList[keyFramesList.size()-1].rotation;
 				break;
 			}
 		case 1:
@@ -66,6 +69,7 @@ public:
 		case 0:
 			{
 				cerr<<"找不到KeyFrame！";
+				return keyFramesList[keyFramesList.size()-1].position;
 				break;
 			}
 		case 1:
@@ -86,6 +90,27 @@ public:
 		}
 	}
 
+	void apply(TimePos timePos)
+	{
+		node->setRotation(getInterpRotation(timePos));
+		node ->setShift(getInterpShift(timePos));
+		node ->updateTransformation();
+	}
+
+	bool isEnable()
+	{
+		return canPlay;
+	}
+
+	void enable()
+	{
+		this->canPlay = true;
+	}
+
+	void disable()
+	{
+		this->canPlay = false;
+	}
 
 	void test()
 	{
@@ -120,6 +145,7 @@ private:
 
 		if(timepos>keyFramesList[indexB].timepos || timepos<keyFramesList[indexA].timepos)
 		{
+			canPlay = false;
 			return 0;
 		}
 
@@ -167,4 +193,6 @@ private:
 
 	/*存储关键帧的列表 的列表。该列表中的每一个元素，是某一个骨骼对应的不同时间的KeyFrame,按照timepos从小到大顺序排列。*/
 	vector<BoneKeyFrame>  keyFramesList;
+	MeshNode * node;  //与之相关联的一个MeshNode
+	bool canPlay;  //是否可以播放
 };
